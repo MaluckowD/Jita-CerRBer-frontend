@@ -42,12 +42,14 @@ export interface ProjectComponent {
   id: string;
   name: string;
   description?: string | null;
+  deleted_at?: string | null;
 }
 
 export interface ProjectInitiativeClassification {
   id: string;
   name: string;
   description?: string | null;
+  deleted_at?: string | null;
 }
 
 export interface ProjectInfoResponse {
@@ -88,6 +90,7 @@ export interface AttachmentDataResponse {
   url: string;
   type: string;
   params: Record<string, unknown> | null;
+  deleted_at?: string | null;
 }
 
 export interface UserCommentAttachmentResponse {
@@ -123,12 +126,14 @@ export interface InitiativeClassificationResponse {
   id: string;
   name: string;
   description: string;
+  deleted_at?: string | null;
 }
 
 export interface ProjectComponentResponse {
   id: string;
   name: string;
   description: string;
+  deleted_at?: string | null;
 }
 
 export interface TaskWithDetailsResponse {

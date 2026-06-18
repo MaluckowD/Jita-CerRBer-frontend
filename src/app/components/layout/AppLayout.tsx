@@ -38,7 +38,7 @@ export function AppLayout() {
         <aside
           className={cn(
             "flex flex-col bg-sidebar border-r border-sidebar-border transition-all duration-200 shrink-0",
-            collapsed ? "w-14" : "w-56",
+            collapsed ? "w-14" : "w-60",
           )}
         >
           {/* Logo */}
@@ -67,7 +67,7 @@ export function AppLayout() {
                     end={exact}
                     className={({ isActive }) =>
                       cn(
-                        "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all",
+                        "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full min-w-0 overflow-hidden",
                         collapsed && "justify-center px-2",
                         isActive
                           ? "bg-primary/15 text-primary border border-primary/25"
@@ -76,7 +76,7 @@ export function AppLayout() {
                     }
                   >
                     <Icon className="size-4 shrink-0" />
-                    {!collapsed && <span>{label}</span>}
+                    {!collapsed && <span className="min-w-0 truncate">{label}</span>}
                   </NavLink>
                 </TooltipTrigger>
                 {collapsed && (
@@ -96,7 +96,7 @@ export function AppLayout() {
                   to="/profile"
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full",
+                      "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full min-w-0 overflow-hidden",
                       collapsed && "justify-center px-2",
                       isActive
                         ? "bg-primary/15 text-primary border border-primary/25"
@@ -106,7 +106,7 @@ export function AppLayout() {
                 >
                   <User className="size-4 shrink-0" />
                   {!collapsed && (
-                    <span className="truncate">{user?.name} {user?.surname}</span>
+                    <span className="min-w-0 truncate">{user?.name} {user?.surname}</span>
                   )}
                 </NavLink>
               </TooltipTrigger>
@@ -122,12 +122,12 @@ export function AppLayout() {
                 <button
                   onClick={handleLogout}
                   className={cn(
-                    "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
+                    "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full min-w-0 overflow-hidden text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
                     collapsed && "justify-center px-2",
                   )}
                 >
                   <LogOut className="size-4 shrink-0" />
-                  {!collapsed && <span>Выйти</span>}
+                  {!collapsed && <span className="min-w-0 truncate">Выйти</span>}
                 </button>
               </TooltipTrigger>
               {collapsed && (
@@ -140,11 +140,11 @@ export function AppLayout() {
             <button
               onClick={() => setCollapsed((c) => !c)}
               className={cn(
-                "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all w-full",
+                "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all w-full min-w-0 overflow-hidden",
                 collapsed && "justify-center px-2",
               )}
             >
-              {collapsed ? <ChevronRight className="size-4" /> : <><ChevronLeft className="size-4" /><span>Свернуть</span></>}
+              {collapsed ? <ChevronRight className="size-4" /> : <><ChevronLeft className="size-4 shrink-0" /><span className="min-w-0 truncate">Свернуть</span></>}
             </button>
           </div>
         </aside>

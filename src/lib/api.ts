@@ -16,6 +16,53 @@ class ApiError extends Error {
   }
 }
 
+type MaybeDeleted = { deleted_at?: string | null };
+
+function isActive<T extends MaybeDeleted>(item: T): boolean {
+  return item.deleted_at == null;
+}
+
+function assertActive<T extends MaybeDeleted>(item: T, resourceName: string): T {
+  if (!isActive(item)) {
+    throw new ApiError(404, `${resourceName} deleted`);
+  }
+  return item;
+}
+
+function normalizeUser(user: UserApiResponse): UserApiResponse {
+  return {
+    ...user,
+    projects: user.projects.filter(({ project }) => isActive(project)),
+  };
+}
+
+function normalizeProject(project: ProjectInfoResponse): ProjectInfoResponse {
+  return {
+    ...project,
+    components: project.components.filter(isActive),
+    initiative_classifications: project.initiative_classifications.filter(isActive),
+  };
+}
+
+function normalizeTaskDetails(task: TaskWithDetailsResponse): TaskWithDetailsResponse {
+  return {
+    ...task,
+    component: task.component && isActive(task.component) ? task.component : null,
+    initiative_classification:
+      task.initiative_classification && isActive(task.initiative_classification)
+        ? task.initiative_classification
+        : null,
+    comments: task.comments
+      .filter(isActive)
+      .map((comment) => ({
+        ...comment,
+        attachments: comment.attachments
+          .filter(isActive)
+          .filter(({ attachment }) => isActive(attachment)),
+      })),
+  };
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
@@ -94,10 +141,10 @@ export const usersApi = {
   login: (data: UserAuth) =>
     request<Token>("/api/v2/users/auth/token/login", { method: "POST", body: JSON.stringify(data) }, false),
 
-  getMe: () => request<UserApiResponse>("/api/v2/users/me"),
+  getMe: () => request<UserApiResponse>("/api/v2/users/me").then(normalizeUser),
 
   editMe: (data: UserEdit) =>
-    request<UserApiResponse>("/api/v2/users/me", { method: "PATCH", body: JSON.stringify(data) }),
+    request<UserApiResponse>("/api/v2/users/me", { method: "PATCH", body: JSON.stringify(data) }).then(normalizeUser),
 
   deleteMe: () =>
     request<OperationResponse>("/api/v2/users/me", { method: "DELETE" }),
@@ -105,15 +152,19 @@ export const usersApi = {
 
 // Projects
 export const projectsApi = {
-  getAll: () => request<ProjectInfoResponse[]>("/api/v2/project/"),
+  getAll: () =>
+    request<ProjectInfoResponse[]>("/api/v2/project/")
+      .then((projects) => projects.filter(isActive).map(normalizeProject)),
 
-  getById: (id: string) => request<ProjectInfoResponse>(`/api/v2/project/${id}`),
+  getById: (id: string) =>
+    request<ProjectInfoResponse>(`/api/v2/project/${id}`)
+      .then((project) => normalizeProject(assertActive(project, "Project"))),
 
   create: (data: ProjectCreate) =>
-    request<ProjectInfoResponse>("/api/v2/project/", { method: "POST", body: JSON.stringify(data) }),
+    request<ProjectInfoResponse>("/api/v2/project/", { method: "POST", body: JSON.stringify(data) }).then(normalizeProject),
 
   update: (id: string, data: ProjectUpdate) =>
-    request<ProjectInfoResponse>(`/api/v2/project/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+    request<ProjectInfoResponse>(`/api/v2/project/${id}`, { method: "PATCH", body: JSON.stringify(data) }).then(normalizeProject),
 
   delete: (id: string) =>
     request<OperationResponse>(`/api/v2/project/${id}`, { method: "DELETE" }),
@@ -131,13 +182,13 @@ export const projectsApi = {
     request<ProjectInfoResponse>(`/api/v2/project/${projectId}/component/`, {
       method: "POST",
       body: JSON.stringify(data),
-    }),
+    }).then(normalizeProject),
 
   updateComponent: (projectId: string, componentId: string, data: ProjectComponentUpdate) =>
     request<ProjectInfoResponse>(`/api/v2/project/${projectId}/component/${componentId}`, {
       method: "PATCH",
       body: JSON.stringify(data),
-    }),
+    }).then(normalizeProject),
 
   deleteComponent: (projectId: string, componentId: string) =>
     request<OperationResponse>(`/api/v2/project/${projectId}/component/${componentId}`, { method: "DELETE" }),
@@ -146,13 +197,13 @@ export const projectsApi = {
     request<ProjectInfoResponse>(`/api/v2/project/${projectId}/initiative_classification/`, {
       method: "POST",
       body: JSON.stringify(data),
-    }),
+    }).then(normalizeProject),
 
   updateInitiativeClassification: (projectId: string, classificationId: string, data: ProjectInitiativeClassificationUpdate) =>
     request<ProjectInfoResponse>(
       `/api/v2/project/${projectId}/initiative_classification/${classificationId}`,
       { method: "PATCH", body: JSON.stringify(data) },
-    ),
+    ).then(normalizeProject),
 
   deleteInitiativeClassification: (projectId: string, classificationId: string) =>
     request<OperationResponse>(
@@ -173,10 +224,13 @@ export const tasksApi = {
       stage: filters?.stage,
       priority: filters?.priority,
     });
-    return request<TaskInfoResponse[]>(`/api/v2/task/${params}`);
+    return request<TaskInfoResponse[]>(`/api/v2/task/${params}`)
+      .then((tasks) => tasks.filter(isActive));
   },
 
-  getById: (id: string) => request<TaskWithDetailsResponse>(`/api/v2/task/${id}`),
+  getById: (id: string) =>
+    request<TaskWithDetailsResponse>(`/api/v2/task/${id}`)
+      .then((task) => normalizeTaskDetails(assertActive(task, "Task"))),
 
   create: (data: TaskCreate) =>
     request<TaskInfoResponse>("/api/v2/task/", { method: "POST", body: JSON.stringify(data) }),
@@ -194,13 +248,23 @@ export const tasksApi = {
     request<UserCommentResponse>(`/api/v2/task/${taskId}/comment`, {
       method: "POST",
       body: JSON.stringify(data),
-    }),
+    }).then((comment) => ({
+      ...comment,
+      attachments: comment.attachments
+        .filter(isActive)
+        .filter(({ attachment }) => isActive(attachment)),
+    })),
 
   updateComment: (taskId: string, commentId: string, data: UserCommentUpdate) =>
     request<UserCommentResponse>(`/api/v2/task/${taskId}/comment/${commentId}`, {
       method: "PATCH",
       body: JSON.stringify(data),
-    }),
+    }).then((comment) => ({
+      ...comment,
+      attachments: comment.attachments
+        .filter(isActive)
+        .filter(({ attachment }) => isActive(attachment)),
+    })),
 
   deleteComment: (taskId: string, commentId: string) =>
     request<OperationResponse>(`/api/v2/task/${taskId}/comment/${commentId}`, { method: "DELETE" }),

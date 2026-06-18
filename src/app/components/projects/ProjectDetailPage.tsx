@@ -84,18 +84,18 @@ export function ProjectDetailPage() {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="px-6 pt-5 pb-0 border-b border-border">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex flex-wrap items-center gap-2 mb-3">
           <Button variant="ghost" size="icon" className="size-7 text-muted-foreground" onClick={() => navigate("/projects")}>
             <ArrowLeft className="size-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
               <span className="text-[10px] text-primary font-mono">{project.shortname}</span>
             </div>
-            <h1 className="text-foreground">{project.name}</h1>
+            <h1 className="text-foreground min-w-0 truncate">{project.name}</h1>
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Button onClick={() => setCreateTaskOpen(true)} size="sm" className="gap-1.5">
+          <div className="ml-auto flex items-center gap-2 shrink-0">
+            <Button onClick={() => setCreateTaskOpen(true)} size="sm" className="gap-1.5 whitespace-nowrap">
               <Plus className="size-3.5" />
               Задача
             </Button>
