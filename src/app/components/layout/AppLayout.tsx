@@ -4,7 +4,7 @@ import { useAuth } from "../../../lib/auth-context";
 import { cn } from "../ui/utils";
 import {
   LayoutGrid, FolderKanban, Settings, LogOut, ChevronLeft, ChevronRight,
-  User, Bell, Search, Plus,
+  User, Bell, Search,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -31,19 +31,26 @@ export function AppLayout() {
     navigate("/auth");
   };
 
+  const navClass = (isActive: boolean) =>
+    cn(
+      "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors w-full min-w-0 overflow-hidden",
+      collapsed && "justify-center px-2",
+      isActive
+        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+    );
+
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex h-screen bg-background overflow-hidden">
-        {/* Sidebar */}
         <aside
           className={cn(
-            "flex flex-col bg-sidebar border-r border-sidebar-border transition-all duration-200 shrink-0",
+            "flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-sm transition-all duration-200 shrink-0",
             collapsed ? "w-14" : "w-60",
           )}
         >
-          {/* Logo */}
           <div className={cn("flex items-center h-14 px-3 border-b border-sidebar-border gap-2", collapsed && "justify-center")}>
-            <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                 <path d="M4 10C4 6.69 6.69 4 10 4s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6z" fill="white" opacity="0.3"/>
                 <path d="M7 10c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z" fill="white"/>
@@ -52,29 +59,16 @@ export function AppLayout() {
             </div>
             {!collapsed && (
               <span className="text-sm tracking-tight text-sidebar-foreground font-mono">
-                CeRBeR<span className="text-primary">JIRA</span>
+                CeRBeR<span className="text-sidebar-primary">JIRA</span>
               </span>
             )}
           </div>
 
-          {/* Nav */}
-          <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+          <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
             {navItems.map(({ to, icon: Icon, label, exact }) => (
               <Tooltip key={to}>
                 <TooltipTrigger asChild>
-                  <NavLink
-                    to={to}
-                    end={exact}
-                    className={({ isActive }) =>
-                      cn(
-                        "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full min-w-0 overflow-hidden",
-                        collapsed && "justify-center px-2",
-                        isActive
-                          ? "bg-primary/15 text-primary border border-primary/25"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                      )
-                    }
-                  >
+                  <NavLink to={to} end={exact} className={({ isActive }) => navClass(isActive)}>
                     <Icon className="size-4 shrink-0" />
                     {!collapsed && <span className="min-w-0 truncate">{label}</span>}
                   </NavLink>
@@ -88,22 +82,10 @@ export function AppLayout() {
             ))}
           </nav>
 
-          {/* Bottom */}
-          <div className="px-2 py-3 border-t border-sidebar-border space-y-0.5">
+          <div className="px-2 py-3 border-t border-sidebar-border space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink
-                  to="/profile"
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full min-w-0 overflow-hidden",
-                      collapsed && "justify-center px-2",
-                      isActive
-                        ? "bg-primary/15 text-primary border border-primary/25"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    )
-                  }
-                >
+                <NavLink to="/profile" className={({ isActive }) => navClass(isActive)}>
                   <User className="size-4 shrink-0" />
                   {!collapsed && (
                     <span className="min-w-0 truncate">{user?.name} {user?.surname}</span>
@@ -122,7 +104,7 @@ export function AppLayout() {
                 <button
                   onClick={handleLogout}
                   className={cn(
-                    "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all w-full min-w-0 overflow-hidden text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
+                    "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors w-full min-w-0 overflow-hidden text-sidebar-foreground hover:bg-destructive/10 hover:text-destructive",
                     collapsed && "justify-center px-2",
                   )}
                 >
@@ -140,23 +122,28 @@ export function AppLayout() {
             <button
               onClick={() => setCollapsed((c) => !c)}
               className={cn(
-                "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all w-full min-w-0 overflow-hidden",
+                "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors w-full min-w-0 overflow-hidden",
                 collapsed && "justify-center px-2",
               )}
             >
-              {collapsed ? <ChevronRight className="size-4" /> : <><ChevronLeft className="size-4 shrink-0" /><span className="min-w-0 truncate">Свернуть</span></>}
+              {collapsed ? (
+                <ChevronRight className="size-4" />
+              ) : (
+                <>
+                  <ChevronLeft className="size-4 shrink-0" />
+                  <span className="min-w-0 truncate">Свернуть</span>
+                </>
+              )}
             </button>
           </div>
         </aside>
 
-        {/* Main */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Topbar */}
           <header className="h-14 flex items-center px-4 border-b border-border gap-3 bg-background/80 backdrop-blur shrink-0">
-            <div className="flex-1 flex items-center gap-2 max-w-md">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted border border-border w-full text-sm text-muted-foreground cursor-pointer hover:border-primary/40 transition-colors">
+            <div className="flex-1 flex items-center gap-2 max-w-md min-w-0">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted border border-border w-full text-sm text-muted-foreground cursor-pointer hover:border-primary/40 transition-colors min-w-0">
                 <Search className="size-3.5 shrink-0" />
-                <span>Поиск задач...</span>
+                <span className="truncate">Поиск задач...</span>
               </div>
             </div>
             <div className="flex items-center gap-2 ml-auto">
@@ -187,7 +174,6 @@ export function AppLayout() {
             </div>
           </header>
 
-          {/* Content */}
           <main className="flex-1 overflow-auto">
             <Outlet />
           </main>

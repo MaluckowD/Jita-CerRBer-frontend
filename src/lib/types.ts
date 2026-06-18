@@ -235,6 +235,7 @@ export interface TaskUpdate {
   name?: string | null;
   description?: string | null;
   priority?: TaskPriority | null;
+  stage?: TaskStage | null;
   planned_start?: string | null;
   planned_end?: string | null;
 }

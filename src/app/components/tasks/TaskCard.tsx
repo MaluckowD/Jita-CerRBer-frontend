@@ -1,9 +1,17 @@
 import { useState } from "react";
-import type { TaskInfoResponse, ProjectInfoResponse } from "../../../lib/types";
+import { useDrag } from "react-dnd";
+import type { TaskInfoResponse, TaskStage, ProjectInfoResponse } from "../../../lib/types";
 import { cn } from "../ui/utils";
 import { TaskDetailModal } from "./TaskDetailModal";
-import { ArrowRight, Clock, User } from "lucide-react";
+import { ArrowRight, Clock, GripVertical, User } from "lucide-react";
 import { tasksApi } from "../../../lib/api";
+
+export const TASK_DND_TYPE = "task-card";
+
+export interface TaskDragItem {
+  id: string;
+  stage: TaskStage;
+}
 
 const priorityConfig = {
   LOW: { label: "Низкий", class: "text-emerald-600", dot: "bg-emerald-500" },
@@ -22,6 +30,16 @@ export function TaskCard({ task, project, onTaskUpdated, onTaskDeleted }: Props)
   const [detailOpen, setDetailOpen] = useState(false);
   const [advancing, setAdvancing] = useState(false);
   const pri = priorityConfig[task.priority];
+  const [{ isDragging }, dragRef] = useDrag(
+    () => ({
+      type: TASK_DND_TYPE,
+      item: { id: task.id, stage: task.stage },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    }),
+    [task.id, task.stage],
+  );
 
   const handleNextStage = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -37,15 +55,20 @@ export function TaskCard({ task, project, onTaskUpdated, onTaskDeleted }: Props)
   return (
     <>
       <div
+        ref={dragRef}
         onClick={() => setDetailOpen(true)}
         className={cn(
-          "bg-card border border-border rounded-lg p-3 cursor-pointer min-w-0",
+          "bg-card border border-border rounded-lg p-3 cursor-grab active:cursor-grabbing min-w-0",
           "hover:border-primary/40 hover:shadow-md hover:shadow-primary/5 transition-all",
+          isDragging && "opacity-45 shadow-none",
         )}
       >
         <div className="flex items-start justify-between gap-2 mb-2">
-          <span className="text-[10px] text-muted-foreground font-mono shrink-0">{project.shortname}-{task.short_id}</span>
-          <div className="flex items-center gap-1 min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <GripVertical className="size-3.5 shrink-0 text-muted-foreground" />
+            <span className="text-[10px] text-muted-foreground font-mono truncate">{project.shortname}-{task.short_id}</span>
+          </div>
+          <div className="flex items-center gap-1 min-w-0 shrink-0">
             <span className={cn("text-[10px] truncate", pri.class)}>{pri.label}</span>
             <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", pri.dot)} />
           </div>

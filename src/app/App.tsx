@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { AuthProvider, useAuth } from "../lib/auth-context";
 import { AppLayout } from "./components/layout/AppLayout";
 import { AuthPage } from "./components/auth/AuthPage";
@@ -64,10 +66,12 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen">
-          <AppRoutes />
-          <Toaster theme="light" />
-        </div>
+        <DndProvider backend={HTML5Backend}>
+          <div className="min-h-screen">
+            <AppRoutes />
+            <Toaster theme="light" />
+          </div>
+        </DndProvider>
       </AuthProvider>
     </BrowserRouter>
   );
