@@ -10,6 +10,12 @@ const columns: { stage: TaskStage; label: string; color: string; bg: string }[] 
   { stage: "DONE", label: "Готово", color: "text-emerald-700", bg: "bg-emerald-100 border-emerald-200" },
 ];
 
+const stageOrder: TaskStage[] = ["NEW", "IN_PROGRESS", "DONE"];
+
+function isNextStage(from: TaskStage, to: TaskStage): boolean {
+  return stageOrder.indexOf(to) === stageOrder.indexOf(from) + 1;
+}
+
 interface Props {
   tasks: TaskInfoResponse[];
   project: ProjectInfoResponse;
@@ -50,12 +56,12 @@ function KanbanColumn({
   const [{ isOver, canDrop }, dropRef] = useDrop(
     () => ({
       accept: TASK_DND_TYPE,
-      canDrop: (item: TaskDragItem) => item.stage !== column.stage,
+      canDrop: (item: TaskDragItem) => isNextStage(item.stage, column.stage),
       drop: (item: TaskDragItem) => {
-        if (item.stage === column.stage) return;
+        if (!isNextStage(item.stage, column.stage)) return;
         const previousStage = item.stage;
         item.stage = column.stage;
-        tasksApi.update(item.id, { stage: column.stage })
+        tasksApi.nextStage(item.id)
           .then(onTaskUpdated)
           .catch(() => {
             item.stage = previousStage;
