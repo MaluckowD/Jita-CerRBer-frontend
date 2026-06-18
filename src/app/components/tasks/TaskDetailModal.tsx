@@ -15,20 +15,20 @@ import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "../ui/utils";
 import {
   Trash2, ArrowRight, MessageSquare, Send, Pencil, Check, X,
-  Calendar, Tag, Layers, User, Clock,
+  Calendar, Tag, Layers, User, Clock, UserCheck, UserX,
 } from "lucide-react";
 import { format } from "date-fns";
 
 const priorityConfig = {
-  LOW: { label: "Низкий", class: "text-emerald-400 bg-emerald-500/15 border-emerald-500/30" },
-  MEDIUM: { label: "Средний", class: "text-amber-400 bg-amber-500/15 border-amber-500/30" },
-  HIGH: { label: "Высокий", class: "text-red-400 bg-red-500/15 border-red-500/30" },
+  LOW: { label: "Низкий", class: "text-emerald-700 bg-emerald-100 border-emerald-200" },
+  MEDIUM: { label: "Средний", class: "text-amber-700 bg-amber-100 border-amber-200" },
+  HIGH: { label: "Высокий", class: "text-red-700 bg-red-100 border-red-200" },
 };
 
 const stageConfig = {
-  NEW: { label: "Новая", class: "text-slate-400 bg-slate-500/15 border-slate-500/30" },
-  IN_PROGRESS: { label: "В работе", class: "text-amber-400 bg-amber-500/15 border-amber-500/30" },
-  DONE: { label: "Готово", class: "text-emerald-400 bg-emerald-500/15 border-emerald-500/30" },
+  NEW: { label: "Новая", class: "text-slate-700 bg-slate-100 border-slate-200" },
+  IN_PROGRESS: { label: "В работе", class: "text-amber-700 bg-amber-100 border-amber-200" },
+  DONE: { label: "Готово", class: "text-emerald-700 bg-emerald-100 border-emerald-200" },
 };
 
 interface Props {
@@ -51,6 +51,7 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
   const [sendingComment, setSendingComment] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingCommentText, setEditingCommentText] = useState("");
+  const [assigneeIdInput, setAssigneeIdInput] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -68,6 +69,41 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
     } catch {}
     setSaving(false);
     setEditingField(null);
+  };
+
+  const handleAssignToMe = async () => {
+    if (!task || !user) return;
+    setSaving(true);
+    try {
+      const updated = await tasksApi.update(task.id, { assignee_id: user.id });
+      setTask((t) => t ? { ...t, ...updated, project: t.project, comments: t.comments, reporter: t.reporter, assignee: { id: user.id, name: user.name }, component: t.component, initiative_classification: t.initiative_classification } : t);
+      onTaskUpdated(updated);
+    } catch {}
+    setSaving(false);
+  };
+
+  const handleClearAssignee = async () => {
+    if (!task) return;
+    setSaving(true);
+    try {
+      const updated = await tasksApi.update(task.id, { assignee_id: null });
+      setTask((t) => t ? { ...t, ...updated, project: t.project, comments: t.comments, reporter: t.reporter, assignee: null, component: t.component, initiative_classification: t.initiative_classification } : t);
+      onTaskUpdated(updated);
+    } catch {}
+    setSaving(false);
+  };
+
+  const handleAssignById = async () => {
+    if (!task || !assigneeIdInput.trim()) return;
+    setSaving(true);
+    try {
+      const updated = await tasksApi.update(task.id, { assignee_id: assigneeIdInput.trim() });
+      const details = await tasksApi.getById(task.id);
+      setTask(details);
+      setAssigneeIdInput("");
+      onTaskUpdated(updated);
+    } catch {}
+    setSaving(false);
   };
 
   const handleNextStage = async () => {
@@ -120,7 +156,7 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-popover border-border max-w-3xl h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="bg-popover border-border max-w-4xl h-[85vh] flex flex-col p-0 gap-0">
         <DialogTitle className="sr-only">Детали задачи</DialogTitle>
         {loading || !task ? (
           <div className="flex items-center justify-center flex-1">
@@ -129,7 +165,7 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
         ) : (
           <>
             {/* Header */}
-            <div className="flex items-center gap-3 px-5 pt-5 pb-3 border-b border-border shrink-0">
+            <div className="flex flex-wrap items-center gap-2 px-5 pt-5 pb-3 pr-12 border-b border-border shrink-0">
               <span className="text-xs font-mono text-muted-foreground">{task.project.shortname}-{task.short_id}</span>
               <div className={cn("text-xs px-2 py-0.5 rounded border", stageConfig[task.stage].class)}>
                 {stageConfig[task.stage].label}
@@ -137,7 +173,7 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
               <div className={cn("text-xs px-2 py-0.5 rounded border", priorityConfig[task.priority].class)}>
                 {priorityConfig[task.priority].label}
               </div>
-              <div className="ml-auto flex items-center gap-1">
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-1">
                 {task.stage !== "DONE" && (
                   <Button size="sm" variant="outline" onClick={handleNextStage} disabled={advancing} className="h-7 gap-1.5 border-border text-xs">
                     <ArrowRight className="size-3" />
@@ -151,9 +187,9 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
             </div>
 
             <ScrollArea className="flex-1 overflow-hidden">
-              <div className="grid grid-cols-[1fr_220px] gap-0 h-full">
+              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_240px] gap-0 h-full">
                 {/* Main content */}
-                <div className="px-5 py-4 space-y-4 border-r border-border">
+                <div className="px-5 py-4 space-y-4 md:border-r border-border min-w-0">
                   {/* Title */}
                   {editingField === "name" ? (
                     <EditableField
@@ -163,8 +199,8 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
                       multiline={false}
                     />
                   ) : (
-                    <div className="group flex items-start gap-2 cursor-pointer" onClick={() => setEditingField("name")}>
-                      <h2 className="text-foreground leading-snug flex-1">{task.name}</h2>
+                    <div className="group flex items-start gap-2 cursor-pointer min-w-0" onClick={() => setEditingField("name")}>
+                      <h2 className="text-foreground leading-snug flex-1 min-w-0 break-words">{task.name}</h2>
                       <Pencil className="size-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 mt-1 shrink-0 transition-opacity" />
                     </div>
                   )}
@@ -225,7 +261,7 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
                     </div>
 
                     {/* New comment */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 min-w-0">
                       <Textarea
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
@@ -278,7 +314,52 @@ export function TaskDetailModal({ open, onOpenChange, taskId, project, onTaskUpd
                     <Label className="text-xs text-muted-foreground flex items-center gap-1">
                       <User className="size-3" />Исполнитель
                     </Label>
-                    <p className="text-sm text-foreground">{task.assignee?.name || "—"}</p>
+                    <div className="space-y-2">
+                      <p className="text-sm text-foreground">{task.assignee?.name || "Не назначен"}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleAssignToMe}
+                          disabled={saving || task.assignee?.id === user?.id}
+                          className="h-7 gap-1.5 border-border text-xs"
+                        >
+                          <UserCheck className="size-3" />
+                          На меня
+                        </Button>
+                        {task.assignee && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={handleClearAssignee}
+                            disabled={saving}
+                            className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <UserX className="size-3" />
+                            Снять
+                          </Button>
+                        )}
+                      </div>
+                      <div className="flex gap-1.5">
+                        <Input
+                          value={assigneeIdInput}
+                          onChange={(e) => setAssigneeIdInput(e.target.value)}
+                          placeholder="ID пользователя"
+                          className="h-8 bg-input-background border-border text-xs"
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleAssignById}
+                          disabled={saving || !assigneeIdInput.trim()}
+                          className="h-8 px-2 text-xs"
+                        >
+                          OK
+                        </Button>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="space-y-1">

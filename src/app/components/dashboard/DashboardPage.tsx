@@ -41,14 +41,14 @@ export function DashboardPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       {/* Greeting */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
           <h1 className="text-foreground">Привет, {user?.name}!</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             {format(new Date(), "EEEE, d MMMM yyyy", { locale: ru })}
           </p>
         </div>
-        <Button onClick={() => navigate("/projects")} variant="outline" size="sm" className="gap-1.5 border-border">
+        <Button onClick={() => navigate("/projects")} variant="outline" size="sm" className="gap-1.5 border-border shrink-0">
           <Plus className="size-3.5" />
           Новый проект
         </Button>
@@ -57,13 +57,13 @@ export function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stats.map(({ label, value, icon: Icon, color, bg }) => (
-          <div key={label} className={cn("flex items-center gap-3 p-4 rounded-xl border bg-card", bg.split(" ")[1])}>
+          <div key={label} className={cn("flex items-center gap-3 p-4 rounded-lg border bg-card min-w-0", bg.split(" ")[1])}>
             <div className={cn("p-2 rounded-lg", bg)}>
               <Icon className={cn("size-4", color)} />
             </div>
             <div>
               <p className="text-2xl text-foreground leading-none mb-0.5">{loading ? "—" : value}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
+              <p className="text-xs text-muted-foreground truncate">{label}</p>
             </div>
           </div>
         ))}

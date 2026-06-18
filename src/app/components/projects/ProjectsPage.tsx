@@ -53,14 +53,14 @@ export function ProjectsPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
           <h1 className="text-foreground">Проекты</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             {projects.length} {projects.length === 1 ? "проект" : "проектов"}
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="gap-2">
+        <Button onClick={() => setCreateOpen(true)} className="gap-2 shrink-0">
           <Plus className="size-4" />
           Новый проект
         </Button>
@@ -125,15 +125,15 @@ function ProjectCard({ project, onClick }: { project: ProjectInfoResponse; onCli
     <button
       onClick={onClick}
       className={cn(
-        "text-left bg-card border border-border rounded-xl p-4 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all group",
+        "text-left bg-card border border-border rounded-lg p-4 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all group min-w-0",
       )}
     >
       <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
             <span className="text-xs text-primary font-mono">{project.shortname}</span>
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">{project.name}</p>
             {project.description && (
               <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{project.description}</p>
@@ -143,10 +143,10 @@ function ProjectCard({ project, onClick }: { project: ProjectInfoResponse; onCli
         <ChevronRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
       </div>
 
-      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2 pt-2 border-t border-border">
-        <span className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-2 pt-2 border-t border-border">
+        <span className="flex items-center gap-1 min-w-0">
           <User className="size-3" />
-          {project.lead.name} {project.lead.surname}
+          <span className="truncate">{project.lead.name} {project.lead.surname}</span>
         </span>
         <span className="flex items-center gap-1">
           <Layers className="size-3" />

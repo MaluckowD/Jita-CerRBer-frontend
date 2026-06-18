@@ -42,7 +42,7 @@ export function ProjectSettingsTab({ project, onProjectUpdated }: Props) {
           Общие настройки
         </h3>
         <form onSubmit={handleSaveGeneral} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-muted-foreground text-sm">Название</Label>
               <Input name="name" defaultValue={project.name} className="bg-input-background border-border" />
@@ -115,7 +115,7 @@ function ComponentsSection({ project, onProjectUpdated }: Props) {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
         <h3 className="text-foreground flex items-center gap-2">
           <Layers className="size-4 text-primary" />
           Компоненты
@@ -212,7 +212,7 @@ function ClassificationsSection({ project, onProjectUpdated }: Props) {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
         <h3 className="text-foreground flex items-center gap-2">
           <Tag className="size-4 text-primary" />
           Типы инициатив

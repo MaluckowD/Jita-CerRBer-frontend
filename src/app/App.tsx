@@ -64,9 +64,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="dark">
+        <div className="min-h-screen">
           <AppRoutes />
-          <Toaster theme="dark" />
+          <Toaster theme="light" />
         </div>
       </AuthProvider>
     </BrowserRouter>

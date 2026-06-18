@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { tasksApi } from "../../../lib/api";
+import { useAuth } from "../../../lib/auth-context";
 import type { ProjectInfoResponse, TaskInfoResponse, TaskPriority } from "../../../lib/types";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
+import { Checkbox } from "../ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
@@ -16,11 +18,13 @@ interface Props {
 }
 
 export function CreateTaskDialog({ open, onOpenChange, project, onCreated }: Props) {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [priority, setPriority] = useState<TaskPriority>("MEDIUM");
   const [classificationId, setClassificationId] = useState<string>("none");
   const [componentId, setComponentId] = useState<string>("none");
+  const [assignToMe, setAssignToMe] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,6 +37,7 @@ export function CreateTaskDialog({ open, onOpenChange, project, onCreated }: Pro
         name: fd.get("name") as string,
         description: (fd.get("description") as string) || project.task_description_template || "",
         priority,
+        assignee_id: assignToMe && user ? user.id : null,
         initiative_classification_id: classificationId !== "none" ? classificationId : null,
         component_id: componentId !== "none" ? componentId : null,
         planned_start: (fd.get("planned_start") as string) || null,
@@ -43,6 +48,7 @@ export function CreateTaskDialog({ open, onOpenChange, project, onCreated }: Pro
       setPriority("MEDIUM");
       setClassificationId("none");
       setComponentId("none");
+      setAssignToMe(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Ошибка создания задачи");
     } finally {
@@ -72,7 +78,7 @@ export function CreateTaskDialog({ open, onOpenChange, project, onCreated }: Pro
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-muted-foreground text-sm">Приоритет</Label>
               <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
@@ -105,6 +111,13 @@ export function CreateTaskDialog({ open, onOpenChange, project, onCreated }: Pro
             )}
           </div>
 
+          {user && (
+            <label className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-foreground cursor-pointer">
+              <Checkbox checked={assignToMe} onCheckedChange={(v) => setAssignToMe(v === true)} />
+              <span className="min-w-0">Назначить задачу на меня</span>
+            </label>
+          )}
+
           {project.initiative_classifications.length > 0 && (
             <div className="space-y-1.5">
               <Label className="text-muted-foreground text-sm">Тип инициативы</Label>
@@ -122,7 +135,7 @@ export function CreateTaskDialog({ open, onOpenChange, project, onCreated }: Pro
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-muted-foreground text-sm">Начало</Label>
               <Input name="planned_start" type="date" className="bg-input-background border-border" />
