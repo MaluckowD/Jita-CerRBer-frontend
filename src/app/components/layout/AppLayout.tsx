@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router";
 import { useAuth } from "../../../lib/auth-context";
 import { cn } from "../ui/utils";
 import {
-  LayoutGrid, FolderKanban, Settings, LogOut, ChevronLeft, ChevronRight,
+  LayoutDashboard, FolderKanban, Settings, LogOut, ChevronLeft, ChevronRight,
   User, Bell, Search,
 } from "lucide-react";
 import {
@@ -17,7 +17,7 @@ import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 const navItems = [
-  { to: "/", icon: LayoutGrid, label: "Дашборд", exact: true },
+  { to: "/", icon: LayoutDashboard, label: "Дашборд", exact: true },
   { to: "/projects", icon: FolderKanban, label: "Проекты" },
 ];
 
@@ -31,13 +31,19 @@ export function AppLayout() {
     navigate("/auth");
   };
 
-  const navClass = (isActive: boolean) =>
+  const navItemClass = (isActive: boolean) =>
     cn(
-      "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors w-full min-w-0 overflow-hidden",
-      collapsed && "justify-center px-2",
+      "group relative flex h-11 items-center gap-3 rounded-lg px-2 text-sm transition-all w-full min-w-0 overflow-hidden",
+      collapsed && "justify-center px-1.5",
       isActive
-        ? "bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] shadow-sm"
-        : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
+        ? "bg-[#eff6ff] text-[#1d4ed8] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.18)]"
+        : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]",
+    );
+
+  const iconBoxClass = (isActive: boolean) =>
+    cn(
+      "flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
+      isActive ? "bg-[#2563eb] text-white" : "bg-[#eef2f7] text-[#64748b] group-hover:bg-white group-hover:text-[#2563eb]",
     );
 
   return (
@@ -45,32 +51,48 @@ export function AppLayout() {
       <div className="flex h-screen bg-background overflow-hidden">
         <aside
           className={cn(
-            "flex flex-col bg-[var(--sidebar)] text-[var(--sidebar-foreground)] border-r border-[var(--sidebar-border)] shadow-sm transition-all duration-200 shrink-0",
-            collapsed ? "w-14" : "w-60",
+            "flex flex-col bg-white text-[#475569] border-r border-[#dbe3ef] shadow-sm transition-all duration-200 shrink-0",
+            collapsed ? "w-16" : "w-64",
           )}
         >
-          <div className={cn("flex items-center h-14 px-3 border-b border-[var(--sidebar-border)] gap-2", collapsed && "justify-center")}>
-            <div className="w-7 h-7 rounded-md bg-[var(--sidebar-primary)] flex items-center justify-center shrink-0">
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                <path d="M4 10C4 6.69 6.69 4 10 4s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6z" fill="white" opacity="0.3"/>
+          <div className={cn("flex items-center h-16 px-3 border-b border-[#dbe3ef] gap-3", collapsed && "justify-center")}>
+            <div className="w-9 h-9 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0 shadow-sm">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10C4 6.69 6.69 4 10 4s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6z" fill="white" opacity="0.28"/>
                 <path d="M7 10c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z" fill="white"/>
                 <path d="M2 5l3 3M2 15l3-3M18 5l-3 3M18 15l-3-3" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </div>
             {!collapsed && (
-              <span className="text-sm tracking-tight text-[var(--sidebar-foreground)] font-mono">
-                CeRBeR<span className="text-[var(--sidebar-primary)]">JIRA</span>
-              </span>
+              <div className="min-w-0">
+                <p className="text-sm leading-tight tracking-tight text-[#0f172a] font-mono">
+                  CeRBeR<span className="text-[#2563eb]">JIRA</span>
+                </p>
+                <p className="text-[11px] leading-tight text-[#64748b]">управление задачами</p>
+              </div>
             )}
           </div>
 
-          <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
+          <nav className="flex-1 px-2.5 py-4 space-y-1.5 overflow-y-auto">
+            {!collapsed && (
+              <p className="px-2 pb-1 text-[11px] font-medium uppercase tracking-wide text-[#94a3b8]">
+                Навигация
+              </p>
+            )}
             {navItems.map(({ to, icon: Icon, label, exact }) => (
               <Tooltip key={to}>
                 <TooltipTrigger asChild>
-                  <NavLink to={to} end={exact} className={({ isActive }) => navClass(isActive)}>
-                    <Icon className="size-4 shrink-0" />
-                    {!collapsed && <span className="min-w-0 truncate">{label}</span>}
+                  <NavLink to={to} end={exact} className={({ isActive }) => navItemClass(isActive)}>
+                    {({ isActive }) => (
+                      <>
+                        <span className={iconBoxClass(isActive)}>
+                          <Icon className="size-4" />
+                        </span>
+                        {!collapsed && (
+                          <span className="min-w-0 truncate font-medium">{label}</span>
+                        )}
+                      </>
+                    )}
                   </NavLink>
                 </TooltipTrigger>
                 {collapsed && (
@@ -82,13 +104,19 @@ export function AppLayout() {
             ))}
           </nav>
 
-          <div className="px-2 py-3 border-t border-[var(--sidebar-border)] space-y-1">
+          <div className="px-2.5 py-3 border-t border-[#dbe3ef] space-y-1.5">
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/profile" className={({ isActive }) => navClass(isActive)}>
-                  <User className="size-4 shrink-0" />
-                  {!collapsed && (
-                    <span className="min-w-0 truncate">{user?.name} {user?.surname}</span>
+                <NavLink to="/profile" className={({ isActive }) => navItemClass(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      <span className={iconBoxClass(isActive)}>
+                        <User className="size-4" />
+                      </span>
+                      {!collapsed && (
+                        <span className="min-w-0 truncate font-medium">{user?.name} {user?.surname}</span>
+                      )}
+                    </>
                   )}
                 </NavLink>
               </TooltipTrigger>
@@ -104,12 +132,14 @@ export function AppLayout() {
                 <button
                   onClick={handleLogout}
                   className={cn(
-                    "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors w-full min-w-0 overflow-hidden text-[var(--sidebar-foreground)] hover:bg-destructive/10 hover:text-destructive",
-                    collapsed && "justify-center px-2",
+                    "group flex h-11 items-center gap-3 rounded-lg px-2 text-sm transition-all w-full min-w-0 overflow-hidden text-[#475569] hover:bg-red-50 hover:text-destructive",
+                    collapsed && "justify-center px-1.5",
                   )}
                 >
-                  <LogOut className="size-4 shrink-0" />
-                  {!collapsed && <span className="min-w-0 truncate">Выйти</span>}
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[#eef2f7] text-[#64748b] transition-colors group-hover:bg-white group-hover:text-destructive">
+                    <LogOut className="size-4" />
+                  </span>
+                  {!collapsed && <span className="min-w-0 truncate font-medium">Выйти</span>}
                 </button>
               </TooltipTrigger>
               {collapsed && (
@@ -122,18 +152,14 @@ export function AppLayout() {
             <button
               onClick={() => setCollapsed((c) => !c)}
               className={cn(
-                "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm text-[var(--sidebar-foreground)] hover:text-[var(--sidebar-accent-foreground)] hover:bg-[var(--sidebar-accent)] transition-colors w-full min-w-0 overflow-hidden",
-                collapsed && "justify-center px-2",
+                "group flex h-10 items-center gap-3 rounded-lg px-2 text-sm text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9] transition-all w-full min-w-0 overflow-hidden",
+                collapsed && "justify-center px-1.5",
               )}
             >
-              {collapsed ? (
-                <ChevronRight className="size-4" />
-              ) : (
-                <>
-                  <ChevronLeft className="size-4 shrink-0" />
-                  <span className="min-w-0 truncate">Свернуть</span>
-                </>
-              )}
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-md">
+                {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+              </span>
+              {!collapsed && <span className="min-w-0 truncate font-medium">Свернуть</span>}
             </button>
           </div>
         </aside>
