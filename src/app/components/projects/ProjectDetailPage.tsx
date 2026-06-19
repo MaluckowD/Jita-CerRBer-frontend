@@ -89,8 +89,8 @@ export function ProjectDetailPage() {
             <ArrowLeft className="size-4" />
           </Button>
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-              <span className="text-[10px] text-primary font-mono">{project.shortname}</span>
+            <div className="h-7 min-w-9 max-w-16 px-1.5 rounded-md bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
+              <span className="max-w-12 truncate text-[10px] leading-none text-primary font-mono">{project.shortname}</span>
             </div>
             <h1 className="text-foreground min-w-0 truncate">{project.name}</h1>
           </div>

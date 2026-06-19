@@ -124,8 +124,8 @@ export function DashboardPage() {
                   onClick={() => navigate(`/projects/${p.id}`)}
                   className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted border border-border hover:border-primary/30 transition-colors cursor-pointer group"
                 >
-                  <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                    <span className="text-[9px] text-primary font-mono">{p.shortname}</span>
+                  <div className="h-7 min-w-9 max-w-16 px-1.5 rounded-md bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
+                    <span className="max-w-12 truncate text-[10px] leading-none text-primary font-mono">{p.shortname}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-foreground line-clamp-1">{p.name}</p>

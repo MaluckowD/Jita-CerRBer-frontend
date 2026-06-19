@@ -36,8 +36,8 @@ export function AppLayout() {
       "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors w-full min-w-0 overflow-hidden",
       collapsed && "justify-center px-2",
       isActive
-        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        ? "bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] shadow-sm"
+        : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
     );
 
   return (
@@ -45,12 +45,12 @@ export function AppLayout() {
       <div className="flex h-screen bg-background overflow-hidden">
         <aside
           className={cn(
-            "flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-sm transition-all duration-200 shrink-0",
+            "flex flex-col bg-[var(--sidebar)] text-[var(--sidebar-foreground)] border-r border-[var(--sidebar-border)] shadow-sm transition-all duration-200 shrink-0",
             collapsed ? "w-14" : "w-60",
           )}
         >
-          <div className={cn("flex items-center h-14 px-3 border-b border-sidebar-border gap-2", collapsed && "justify-center")}>
-            <div className="w-7 h-7 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
+          <div className={cn("flex items-center h-14 px-3 border-b border-[var(--sidebar-border)] gap-2", collapsed && "justify-center")}>
+            <div className="w-7 h-7 rounded-md bg-[var(--sidebar-primary)] flex items-center justify-center shrink-0">
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                 <path d="M4 10C4 6.69 6.69 4 10 4s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6z" fill="white" opacity="0.3"/>
                 <path d="M7 10c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z" fill="white"/>
@@ -58,8 +58,8 @@ export function AppLayout() {
               </svg>
             </div>
             {!collapsed && (
-              <span className="text-sm tracking-tight text-sidebar-foreground font-mono">
-                CeRBeR<span className="text-sidebar-primary">JIRA</span>
+              <span className="text-sm tracking-tight text-[var(--sidebar-foreground)] font-mono">
+                CeRBeR<span className="text-[var(--sidebar-primary)]">JIRA</span>
               </span>
             )}
           </div>
@@ -82,7 +82,7 @@ export function AppLayout() {
             ))}
           </nav>
 
-          <div className="px-2 py-3 border-t border-sidebar-border space-y-1">
+          <div className="px-2 py-3 border-t border-[var(--sidebar-border)] space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/profile" className={({ isActive }) => navClass(isActive)}>
@@ -104,7 +104,7 @@ export function AppLayout() {
                 <button
                   onClick={handleLogout}
                   className={cn(
-                    "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors w-full min-w-0 overflow-hidden text-sidebar-foreground hover:bg-destructive/10 hover:text-destructive",
+                    "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors w-full min-w-0 overflow-hidden text-[var(--sidebar-foreground)] hover:bg-destructive/10 hover:text-destructive",
                     collapsed && "justify-center px-2",
                   )}
                 >
@@ -122,7 +122,7 @@ export function AppLayout() {
             <button
               onClick={() => setCollapsed((c) => !c)}
               className={cn(
-                "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors w-full min-w-0 overflow-hidden",
+                "flex h-10 items-center gap-2.5 rounded-md px-2.5 text-sm text-[var(--sidebar-foreground)] hover:text-[var(--sidebar-accent-foreground)] hover:bg-[var(--sidebar-accent)] transition-colors w-full min-w-0 overflow-hidden",
                 collapsed && "justify-center px-2",
               )}
             >

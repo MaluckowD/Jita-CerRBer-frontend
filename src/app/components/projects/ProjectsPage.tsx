@@ -130,8 +130,8 @@ function ProjectCard({ project, onClick }: { project: ProjectInfoResponse; onCli
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-            <span className="text-xs text-primary font-mono">{project.shortname}</span>
+          <div className="h-8 min-w-10 max-w-20 px-2 rounded-md bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
+            <span className="max-w-14 truncate text-[11px] leading-none text-primary font-mono">{project.shortname}</span>
           </div>
           <div className="min-w-0">
             <p className="text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">{project.name}</p>

@@ -100,8 +100,8 @@ export function ProfilePage() {
           <div className="space-y-2">
             {user.projects.map(({ project, role, member_from }) => (
               <div key={project.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted border border-border">
-                <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                  <span className="text-[9px] text-primary font-mono">{project.name.slice(0, 3).toUpperCase()}</span>
+                <div className="h-7 min-w-9 max-w-16 px-1.5 rounded-md bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
+                  <span className="max-w-12 truncate text-[10px] leading-none text-primary font-mono">{project.name.slice(0, 6).toUpperCase()}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-foreground">{project.name}</p>
